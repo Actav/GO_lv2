@@ -22,7 +22,7 @@ func main() {
     }
 
   // сгенерируем в цикле N пустых файлов
-    for i := 0; i < 10; i++ {
+    for i := 0; i < 1000000; i++ {
       // создаим новый файл согласно индексу интерации
         f, err := os.Create(fmt.Sprintf("./emptyDir/%d", i))
         if err != nil {
