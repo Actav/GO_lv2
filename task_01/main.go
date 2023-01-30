@@ -12,23 +12,24 @@ import (
 )
 
 var (
-  wg sync.WaitGroup
-  m sync.Mutex
-  sem = make(chan struct{}, 50)
+	wg sync.WaitGroup
+	m sync.Mutex
+	sem = make(chan struct{}, 50)
 )
 
 func main() {
-  counter := 0
+	counter := 0
 
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
-    sem <- struct{}{}
+		sem <- struct{}{}
+
 		go func() {
 			m.Lock()
-			   counter++
+				counter++
 			m.Unlock()
 
-      <-sem
+			<-sem
 			wg.Done()
 		}()
 	}
