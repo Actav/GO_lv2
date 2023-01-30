@@ -7,39 +7,32 @@
 package main
 
 import (
-  "fmt"
-  "time"
+	"fmt"
+	"sync"
+)
+
+var (
+  wg sync.WaitGroup
+  m sync.Mutex
+  sem = make(chan struct{}, 50)
 )
 
 func main() {
-  count := 0
-  c := make(chan int, 10)
-  defer func ()  {
-    fmt.Println("count ==", count)
+  counter := 0
 
-  }()
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+    sem <- struct{}{}
+		go func() {
+			m.Lock()
+			   counter++
+			m.Unlock()
 
-  go func() {
-    defer func ()  {
-      <-c
-    }()
+      <-sem
+			wg.Done()
+		}()
+	}
 
-    var i int
-    for {
-      c <- i
-      i++
-    }
-  }()
-
-  go func() {
-    for f := range c {
-      if f > 999 {
-        return
-      }
-      count++
-    }
-  }()
-
-  // select{}
-  time.Sleep(2 * time.Second)
+	wg.Wait()
+	fmt.Println("Counter:", counter)
 }
